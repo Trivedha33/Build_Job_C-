@@ -1,21 +1,21 @@
 pipeline {
     agent any
-    
+
     environment {
         BUILD_DIR = 'build'
         SOURCE_DIR = '.'
         GCOV_DIR = 'coverage_report'
         CMAKE_EXECUTABLE = '/usr/bin/cmake'
     }
-    
+
     stages {
         stage('Checkout SCM') {
             steps {
-                // Checkout the code from your GitHub repository
-                git 'https://github.com/Trivedha33/Build_Job_C-.git'
+                // Checkout code from GitHub with specified branch, in case it's not 'master'
+                git branch: 'main', url: 'https://github.com/Trivedha33/Build_Job_C-.git'
             }
         }
-        
+
         stage('Clean Workspace') {
             steps {
                 sh '''
@@ -25,7 +25,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Configure') {
             steps {
                 dir(BUILD_DIR) {
@@ -38,7 +38,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build') {
             steps {
                 dir(BUILD_DIR) {
@@ -46,7 +46,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Test') {
             steps {
                 dir(BUILD_DIR) {
@@ -54,19 +54,19 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Generate Coverage') {
             steps {
                 sh 'mkdir -p ${GCOV_DIR}'
-                
+
                 sh '''
                     lcov --capture --directory ${BUILD_DIR} --output-file ${GCOV_DIR}/coverage.info
                     lcov --remove ${GCOV_DIR}/coverage.info '/usr/include/*' '/usr/lib/*' '*/tests/*' --output-file ${GCOV_DIR}/filtered_coverage.info
                     genhtml ${GCOV_DIR}/filtered_coverage.info --output-directory ${GCOV_DIR}/html
                 '''
-                
+
                 archiveArtifacts artifacts: "${GCOV_DIR}/**/*", fingerprint: true
-                
+
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
@@ -78,17 +78,17 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             cleanWs(patterns: [[pattern: '**/*.gcda', type: 'INCLUDE'],
-                             [pattern: '**/*.gcno', type: 'INCLUDE']])
+                               [pattern: '**/*.gcno', type: 'INCLUDE']])
         }
-        
+
         success {
             echo 'Pipeline completed successfully!'
         }
-        
+
         failure {
             echo 'Pipeline failed! Check the logs for details.'
         }

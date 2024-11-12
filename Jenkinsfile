@@ -11,7 +11,6 @@ pipeline {
     stages {
         stage('Checkout SCM') {
             steps {
-                // Checkout code from GitHub with specified branch, in case it's not 'master'
                 git branch: 'main', url: 'https://github.com/Trivedha33/Build_Job_C-.git'
             }
         }
@@ -58,13 +57,10 @@ pipeline {
         stage('Generate Coverage') {
             steps {
                 sh 'mkdir -p ${GCOV_DIR}'
-                
-                // Clean up any previous coverage data to avoid conflicts
-                sh 'find . -name "*.gcda" -o -name "*.gcno" -exec rm -f {} +'
 
-                // Capture coverage data with error handling options
+                // Capture coverage data with error handling
                 sh '''
-                    lcov --capture --directory ${BUILD_DIR} --output-file ${GCOV_DIR}/coverage.info --ignore-errors mismatch
+                    lcov --capture --directory ${BUILD_DIR} --output-file ${GCOV_DIR}/coverage.info --ignore-errors mismatch --ignore-errors gcov
                     lcov --remove ${GCOV_DIR}/coverage.info '/usr/include/*' '/usr/lib/*' '*/tests/*' --output-file ${GCOV_DIR}/filtered_coverage.info
                     genhtml ${GCOV_DIR}/filtered_coverage.info --output-directory ${GCOV_DIR}/html
                 '''
@@ -85,8 +81,7 @@ pipeline {
 
     post {
         always {
-            cleanWs(patterns: [[pattern: '**/*.gcda', type: 'INCLUDE'],
-                               [pattern: '**/*.gcno', type: 'INCLUDE']])
+            cleanWs(patterns: [[pattern: '**/*.gcda', type: 'INCLUDE']])
         }
 
         success {

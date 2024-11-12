@@ -1,4 +1,4 @@
-i#include <gtest/gtest.h>
+#include <gtest/gtest.h>
 #include "MyCode.h"
 #include <stdexcept>
 
@@ -55,7 +55,3 @@ TEST(CalculatorTest, ReverseString) {
     EXPECT_EQ(Calculator::reverseString("a"), "a");
     EXPECT_EQ(Calculator::reverseString("12345"), "54321");
 }
-Last edited 17 minutes ago
-
-
-

@@ -5,10 +5,7 @@ pipeline {
         BUILD_DIR = 'build'
         SOURCE_DIR = '.'
         GCOV_DIR = 'coverage_report'
-    }
-    
-    tools {
-        cmake 'cmake-latest'
+        CMAKE_EXECUTABLE = '/usr/bin/cmake'
     }
     
     stages {
@@ -33,7 +30,7 @@ pipeline {
             steps {
                 dir(BUILD_DIR) {
                     sh '''
-                        cmake -DCMAKE_BUILD_TYPE=Debug \
+                        ${CMAKE_EXECUTABLE} -DCMAKE_BUILD_TYPE=Debug \
                             -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
                             -DCMAKE_EXE_LINKER_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
                             ${WORKSPACE}/${SOURCE_DIR}

@@ -26,7 +26,6 @@ int main() {
     }
     return 0;
 }
-Last edited 16 minutes ago
 
 
 

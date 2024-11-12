@@ -18,16 +18,16 @@ pipeline {
         stage('Clean Workspace') {
             steps {
                 sh '''
-                    rm -rf ${BUILD_DIR}
-                    rm -rf ${GCOV_DIR}
-                    mkdir -p ${BUILD_DIR}
+                    rm -rf "${BUILD_DIR}"
+                    rm -rf "${GCOV_DIR}"
+                    mkdir -p "${BUILD_DIR}"
                 '''
             }
         }
 
         stage('Configure') {
             steps {
-                dir(BUILD_DIR) {
+                dir("${BUILD_DIR}") {
                     sh '''
                         ${CMAKE_EXECUTABLE} -DCMAKE_BUILD_TYPE=Debug \
                             -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
@@ -40,7 +40,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir(BUILD_DIR) {
+                dir("${BUILD_DIR}") {
                     sh 'cmake --build . -- -j$(nproc)'
                 }
             }
@@ -48,7 +48,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir(BUILD_DIR) {
+                dir("${BUILD_DIR}") {
                     sh 'ctest --output-on-failure'
                 }
             }
@@ -56,13 +56,13 @@ pipeline {
 
         stage('Generate Coverage') {
             steps {
-                sh 'mkdir -p ${GCOV_DIR}'
+                sh 'mkdir -p "${GCOV_DIR}"'
 
-                // Capture coverage data with error handling
+                # Capture coverage data with error handling
                 sh '''
-                    lcov --capture --directory ${BUILD_DIR} --output-file ${GCOV_DIR}/coverage.info --ignore-errors mismatch --ignore-errors gcov
-                    lcov --remove ${GCOV_DIR}/coverage.info '/usr/include/*' '/usr/lib/*' '*/tests/*' --output-file ${GCOV_DIR}/filtered_coverage.info --ignore-errors unused
-                    genhtml ${GCOV_DIR}/filtered_coverage.info --output-directory ${GCOV_DIR}/html
+                    lcov --capture --directory "${BUILD_DIR}" --output-file "${GCOV_DIR}/coverage.info" --ignore-errors mismatch --ignore-errors gcov
+                    lcov --remove "${GCOV_DIR}/coverage.info" '/usr/include/*' '/usr/lib/*' '*/tests/*' --output-file "${GCOV_DIR}/filtered_coverage.info" --ignore-errors unused
+                    genhtml "${GCOV_DIR}/filtered_coverage.info" --output-directory "${GCOV_DIR}/html"
                 '''
 
                 archiveArtifacts artifacts: "${GCOV_DIR}/**/*", fingerprint: true

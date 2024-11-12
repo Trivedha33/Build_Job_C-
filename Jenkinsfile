@@ -58,9 +58,13 @@ pipeline {
         stage('Generate Coverage') {
             steps {
                 sh 'mkdir -p ${GCOV_DIR}'
+                
+                // Clean up any previous coverage data to avoid conflicts
+                sh 'find . -name "*.gcda" -o -name "*.gcno" -exec rm -f {} +'
 
+                // Capture coverage data with error handling options
                 sh '''
-                    lcov --capture --directory ${BUILD_DIR} --output-file ${GCOV_DIR}/coverage.info
+                    lcov --capture --directory ${BUILD_DIR} --output-file ${GCOV_DIR}/coverage.info --ignore-errors mismatch
                     lcov --remove ${GCOV_DIR}/coverage.info '/usr/include/*' '/usr/lib/*' '*/tests/*' --output-file ${GCOV_DIR}/filtered_coverage.info
                     genhtml ${GCOV_DIR}/filtered_coverage.info --output-directory ${GCOV_DIR}/html
                 '''

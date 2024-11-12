@@ -61,7 +61,7 @@ pipeline {
                 // Capture coverage data with error handling
                 sh '''
                     lcov --capture --directory ${BUILD_DIR} --output-file ${GCOV_DIR}/coverage.info --ignore-errors mismatch --ignore-errors gcov
-                    lcov --remove ${GCOV_DIR}/coverage.info '/usr/include/*' '/usr/lib/*' '*/tests/*' --output-file ${GCOV_DIR}/filtered_coverage.info
+                    lcov --remove ${GCOV_DIR}/coverage.info '/usr/include/*' '/usr/lib/*' '*/tests/*' --output-file ${GCOV_DIR}/filtered_coverage.info --ignore-errors unused
                     genhtml ${GCOV_DIR}/filtered_coverage.info --output-directory ${GCOV_DIR}/html
                 '''
 

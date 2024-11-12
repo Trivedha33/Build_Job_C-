@@ -12,6 +12,13 @@ pipeline {
     }
     
     stages {
+        stage('Checkout SCM') {
+            steps {
+                // Checkout the code from your GitHub repository
+                git 'https://github.com/Trivedha33/Build_Job_C-.git'
+            }
+        }
+        
         stage('Clean Workspace') {
             steps {
                 sh '''
@@ -90,3 +97,7 @@ pipeline {
         }
     }
 }
+
+
+
+
